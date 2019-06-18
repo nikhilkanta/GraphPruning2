@@ -29,6 +29,7 @@ def compute_significance(G):
         __compute_significance_undirected(G)
 
 def __compute_significance_directed(G):
+
     """
     Compute the edge significance for the edges of the
     given graph C{G} in place.
@@ -37,24 +38,24 @@ def __compute_significance_directed(G):
 
     @param G: networkx.graph instance. C{G} is assumed to be directed.
 
-    @keyword w: weight of the undirected edge.
-    @keyword ku: total incident weight (strength) of the first vertex.
-    @keyword kv: total incident weight (strength) of the second vertex.
-    @keyword q: total incident weight of all vertices divided by two. Similar to the total number of edges in the graph.
-
     """
 
     degree_of_nodes = G.degree(G.nodes(), weight='weight')
+
     in_degree_of_nodes = G.in_degree(G.nodes(), weight='weight')
+
     out_degree_of_nodes = G.out_degree(G.nodes(), weight='weight')
+
     total_degree = np.array(list((dict(degree_of_nodes).values()))).sum()
 
     weight_of_edges = nx.get_edge_attributes(G, 'weight')
 
     # set a attribute named significance in graph G if not already set
+
     if len(nx.get_edge_attributes(G, 'significance')) == 0:
         nx.set_edge_attributes(G, 'significance', 0)
 
+    # compute significance of each edge
     for edge_pair in G.edges():
         first_node, second_node = edge_pair
 
