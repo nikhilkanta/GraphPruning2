@@ -37,39 +37,49 @@ def __compute_significance_directed(G):
 
     @param G: networkx.graph instance. C{G} is assumed to be directed.
 
+    @keyword w: weight of the undirected edge.
+    @keyword ku: total incident weight (strength) of the first vertex.
+    @keyword kv: total incident weight (strength) of the second vertex.
+    @keyword q: total incident weight of all vertices divided by two. Similar to the total number of edges in the graph.
+
     """
+
     degree_of_nodes = G.degree(G.nodes(), weight='weight')
+    in_degree_of_nodes = G.in_degree(G.nodes(), weight='weight')
+    out_degree_of_nodes = G.out_degree(G.nodes(), weight='weight')
     total_degree = np.array(list((dict(degree_of_nodes).values()))).sum()
 
-    weights_of_edges = nx.get_edge_attributes(G, 'weight')
+    weight_of_edges = nx.get_edge_attributes(G, 'weight')
 
     # set a attribute named significance in graph G if not already set
     if len(nx.get_edge_attributes(G, 'significance')) == 0:
         nx.set_edge_attributes(G, 'significance', 0)
 
     for edge_pair in G.edges():
-        first_edge, second_edge = edge_pair
+        first_node, second_node = edge_pair
 
         try:
-            p_value = compute_pvalue(weight_of_the_directed_edge = weights[edge_pair],
-            total_incident_weight_of_first_node=degree_of_nodes[first_edge],
-            total_incident_weight_of_second_node=degree_of_nodes[second_edge],
-            total_incident_weight_of_all_nodes=total_degree / 2.0)
+            p_value = compute_pvalue(mode=directed,
+            weight_of_the_directed_edge = weight_of_edges[edge_pair],
+            total_in_degree_of_first_node=in_degree_of_nodes[first_node],
+            total_out_degree_of_second_node=out_degree_of_nodes[second_node],
+            total_degree_of_all_nodes=total_degree / 2.0)
 
-            G[first_edge][second_edge]['significance'] = -log(p_value)
+            G[first_node][second_node]['significance'] = -log(p_value)
 
         except ValueError:
              # print e['weight'], ks[i0], ks[i1], total_degree, p
-            G[first_edge][second_edge]['significance'] = None
+            G[first_node][second_node]['significance'] = None
             # print "error computing significance", p
 
     significances = nx.get_edge_attributes(G, 'significance')
+
     max_significance = max(significances)
 
     for edge_pair in G.edges():
-        first_edge, second_edge = edge_pair
-        if G[first_edge][second_edge]['significance'] is None:
-            G[first_edge][second_edge]['significance'] = max_significance
+        first_node, second_node = edge_pair
+        if G[first_node][second_node]['significance'] is None:
+            G[first_node][second_node]['significance'] = max_significance
 
     return(0)
 
@@ -77,38 +87,49 @@ def __compute_significance_directed(G):
 
 def __compute_significance_undirected(G):
     """
-    Compute the edge significance for the edges of the
-    given graph C{G} in place. C{'weight'} is expected
-    to have been set already.
+    Compute the edge significance for the edges of the given graph C{G} in place.
+
+    C{'weight'} is expected to have been set already.
+
     @param G: networkx.graph instance. C{G} is assumed to be undirected.
     """
-    ks = G.degree(G.nodes(), weight='weight')
-    total_degree = 0
-    for n in G.nodes():
-        i = ks[n]
-        total_degree = total_degree + i
+    degree_of_nodes = G.degree(G.nodes(), weight='weight')
+    total_degree = np.array(list((dict(degree_of_nodes).values()))).sum()
+
+    weight_of_edges = nx.get_edge_attributes(G, 'weight')
 
 
-    weights = nx.get_edge_attributes(G, 'weight')
+    # set a attribute named significance in graph G if not already set
     if len(nx.get_edge_attributes(G, 'significance')) == 0:
         nx.set_edge_attributes(G, 'significance', 0)
-    for e in G.edges():
-        i0, i1 = e
+
+    for edge_pair in G.edges():
+        first_node, second_node = edge_pair
 
         try:
-            p = pvalue(w = weights[e], ku=ks[i0], kv=ks[i1], q=total_degree / 2.0)
-            G[i0][i1]['significance'] = -log(p)
+            p_value = compute_pvalue(mode=directed,
+            weight_of_the_undirected_edge = weight_of_edges[edge_pair],
+            total_degree_of_first_node=degree_of_nodes[first_node],
+            total_degree_of_second_node=degree_of_nodes[second_node],
+            total_degree_of_all_nodes=total_degree / 2.0)
+
+            G[first_node][second_node]['significance'] = -log(p_value)
+
         except ValueError:
              # print e['weight'], ks[i0], ks[i1], total_degree, p
-            G[i0][i1]['significance'] = None
-
+            G[first_node][second_node]['significance'] = None
             # print "error computing significance", p
+
     significances = nx.get_edge_attributes(G, 'significance')
-    max_sig = max(significances)
-    for e in G.edges():
-        i0, i1 = e
-        if G[i0][i1]['significance'] is None:
-            G[i0][i1]['significance'] = max_sig
+    max_significance = max(significances)
+
+    for edge_pair in G.edges():
+        first_node, second_node = edge_pair
+        if G[first_node][second_node]['significance'] is None:
+            G[first_node][second_node]['significance'] = max_significance
+
+    return(0)
+
 
 def compute_pvalue(mode="undirected", **params):
     """
@@ -134,20 +155,70 @@ def compute_pvalue(mode="undirected", **params):
 def __pvalue_undirected(**params):
     """
     Compute the pvalue for the undirected edge null model.
-    Use a standard binomial test from the statsmodels package.
+    Using a standard binomial test from the statsmodels package.
 
-    @keyword w: weight of the undirected edge.
-    @keyword ku: total incident weight (strength) of the first node.
-    @keyword kv: total incident weight (strength) of the second node.
-    @keyword q: total incident weight of all nodes divided by two. Similar to the total number of edges in the graph.
     """
-    weight_of_the_undirected_edge = params.get("w")
-    total_incident_weight_of_first_node = params.get("ku")
-    total_incident_weight_of_second_node = params.get("kv")
-    total_incident_weight_of_all_nodes = params.get("q")
+    weight_of_the_undirected_edge = params.get("weight_of_the_undirected_edge")
+    total_degree_of_first_node = params.get("total_degree_of_first_node")
+    total_degree_of_second_node = params.get("total_degree_of_second_node")
+    total_degree_of_all_nodes = params.get("total_degree_of_all_nodes")
 
-    if not (weight_of_the_undirected_edge and total_incendent_weigth_of_first_node and total_incendent_weigth_of_second_node and total_incident_weight_of_all_nodes):
+    if not (weight_of_the_undirected_edge and total_incendent_weigth_of_first_node and total_incendent_weigth_of_second_node and total_degree_of_all_nodes):
         raise ValueError
 
-    p = ku * kv * 1.0 / q / q / 2.0
-    return binom_test(count=w, nobs=q, prop=p, alternative="larger")
+    prop = total_degree_of_first_node * total_degree_of_second_node * 1.0 / total_degree_of_all_nodes / total_degree_of_all_nodes / 2.0
+
+    return binom_test(count=weight_of_the_undirected_edge,
+                    nobs=total_degree_of_all_nodes,
+                    prop=prop,
+                    alternative="larger")
+def __pvalue_directed(**params):
+    """
+    Compute the pvalue for the directed edge null model.
+    Use a standard binomial test from the statsmodels package
+
+    """
+
+
+    weight_of_the_directed_edge = params.get("weight_of_the_directed_edge")
+    total_degree_of_first_node = params.get("total_degree_of_first_node")
+    total_degree_of_second_node = params.get("total_degree_of_second_node")
+    total_degree_of_all_nodes = params.get("total_degree_of_all_nodes")
+
+    p = 1.0 * ku_out * kv_in / q / q / 1.0
+    print ("p = %f" % p)
+    return binom_test(count=w_uv, nobs=q, prop=p, alternative="larger")
+
+
+def prune(G, field='significance', percent=None, num_remove=None):
+    """
+    Remove all but the top x percent of the edges of the graph
+    with respect to an edge attribute.
+
+    @param G: a networkx graph instance.
+    @param field: the edge attribute to prune with respect to.
+    @param percent: percentage of the edges with the highest field value to retain.
+    @param num_remove: number of edges to remove. Used only if C{percent} is C{None}.
+    """
+    fieldh = nx.get_edge_attributes(G, field)
+    f = np.zeros(len(G.edges()))
+    i = 0
+    for e in G.edges():
+        f[i] = fieldh[e]
+        i = i + 1
+
+    if percent:
+        deathrow = []
+        n = len(G.edges())
+        threshold_index = n - n * percent / 100
+        threshold_value = sorted(f)[threshold_index]
+
+        for e in G.edges():
+            if fieldh[e] < threshold_value:
+                deathrow.append(e)
+        G.remove_edges_from(deathrow)
+
+    elif num_remove:
+        sorted_indices = np.argsort(feildh)
+        G.remove_edges_from(sorted_indices[:num_remove])
+    return G
