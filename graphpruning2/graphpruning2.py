@@ -135,12 +135,6 @@ def compute_pvalue(mode="undirected", **params):
     """
     Compute the p-value of a given edge according the MLF significance filter.
 
-    @param mode: can be C{"directed"} or C{"undirected"}.
-    @kwarg w: integer weight of the edge.
-    @kwarg ku: weighted degree of one end node.
-    @kwarg kv: weighted degree of the other end node.
-    @kwarg q: sum of all weighted degrees in graph divided by 2.
-
     Other parameters are different for the B{directed} and B{undirected} cases.
     See L{__pvalue_directed} and L{__pvalue_undirected} for detailed description of parameters.
     """
@@ -179,16 +173,16 @@ def __pvalue_directed(**params):
 
     """
 
-
     weight_of_the_directed_edge = params.get("weight_of_the_directed_edge")
-    total_degree_of_first_node = params.get("total_degree_of_first_node")
-    total_degree_of_second_node = params.get("total_degree_of_second_node")
+    total_in_degree_of_first_node = params.get("total_in_degree_of_first_node")
+    total_out_degree_of_second_node = params.get("total_out_degree_of_second_node")
     total_degree_of_all_nodes = params.get("total_degree_of_all_nodes")
 
-    p = 1.0 * ku_out * kv_in / q / q / 1.0
-    print ("p = %f" % p)
-    return binom_test(count=w_uv, nobs=q, prop=p, alternative="larger")
+    prop = 1.0 * total_in_degree_of_first_node * total_out_degree_of_second_node / total_degree_of_all_nodes / total_degree_of_all_nodes / 1.0
+    #print ("p = %f" % p)
+    return binom_test(count=weight_of_the_directed_edge, nobs=total_degree_of_all_nodes, prop=prp, alternative="larger")
 
+"""Done till here on 15/6/19"""
 
 def prune(G, field='significance', percent=None, num_remove=None):
     """
