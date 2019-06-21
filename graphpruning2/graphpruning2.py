@@ -53,7 +53,7 @@ def __compute_significance_directed(G):
     # set a attribute named significance in graph G if not already set
 
     if len(nx.get_edge_attributes(G, 'significance')) == 0:
-        nx.set_edge_attributes(G, 'significance', 0)
+        nx.set_edge_attributes(G, 0, 'significance')
 
     # compute significance of each edge
     for edge_pair in G.edges():
@@ -83,7 +83,6 @@ def __compute_significance_directed(G):
 
     return(0)
 
-"""Done till here on 15/6/19"""
 
 def __compute_significance_undirected(G):
     """
@@ -101,7 +100,7 @@ def __compute_significance_undirected(G):
 
     # set a attribute named significance in graph G if not already set
     if len(nx.get_edge_attributes(G, 'significance')) == 0:
-        nx.set_edge_attributes(G, 'significance', 0)
+        nx.set_edge_attributes(G, 0, 'significance')
 
     for edge_pair in G.edges():
         first_node, second_node = edge_pair
@@ -182,7 +181,8 @@ def __pvalue_directed(**params):
     #print ("p = %f" % p)
     return binom_test(count=weight_of_the_directed_edge, nobs=total_degree_of_all_nodes, prop=prp, alternative="larger")
 
-"""Done till here on 15/6/19"""
+
+
 
 def prune(G, attribute_to_prune='significance', percentage_of_edges_to_remove=None, number_of_edges_to_remove=None):
     """

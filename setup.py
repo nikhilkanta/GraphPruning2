@@ -45,4 +45,8 @@ if __name__ == "__main__":
         packages=packages,
         install_requires=install_requires,
         python_requires='>=3.5',
+        classifiers=[
+            'License :: OSI Approved :: MIT License',
+            'Programming Language :: Python :: 3.5'
+            ],
     )
