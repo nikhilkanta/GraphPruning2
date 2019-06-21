@@ -13,4 +13,4 @@ def test_compute_significance():
 def test_prune():
     number_of_edges_to_remove = number_of_edges / 2
     G_pruned = gp.prune(G, attribute_to_prune="significance", number_of_edges_to_remove=number_of_edges_to_remove)
-    assert len(G_pruned.edges()) = number_of_edges / 2
+    assert len(G_pruned.edges()) == number_of_edges / 2
