@@ -37,10 +37,12 @@ if __name__ == "__main__":
         name=release.name.lower(),
         version=version,
         author="Nikhil Kanta",
-        author_email="nikhilkantz5@gmail.com",
-        license=release.license,
+        author_email="nikhilkantz25@gmail.com",
+        license="MIT",
+        url ="https://github.com/nikhilkanta/GraphPruning2",
+        download_url = "https://github.com/nikhilkanta/GraphPruning2/archive/master.zip",
+        keywords = ['networks', 'networkx', 'Pruning', 'graphs'],
         packages=packages,
         install_requires=install_requires,
         python_requires='>=3.5',
-        zip_safe=False
     )
