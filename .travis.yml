@@ -11,7 +11,7 @@ before_install:
   - conda create --yes --name testenv python=$TRAVIS_PYTHON_VERSION
   - source activate testenv
   - "pip install -U pip"
-  -"python setup.py install"
+  - "python setup.py install"
 
 install:
   - pip install -r requirements.dev.txt
