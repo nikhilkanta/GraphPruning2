@@ -74,8 +74,7 @@ def __compute_significance_directed(G):
             # print "error computing significance", p
 
     significances = nx.get_edge_attributes(G, 'significance')
-
-    max_significance = max(significances)
+    max_significance = max(significances.values())
 
     for edge_pair in G.edges():
         first_node, second_node = edge_pair
@@ -122,7 +121,7 @@ def __compute_significance_undirected(G):
             # print "error computing significance", p
 
     significances = nx.get_edge_attributes(G, 'significance')
-    max_significance = max(significances)
+    max_significance = max(significances.values())
 
     for edge_pair in G.edges():
         first_node, second_node = edge_pair
@@ -185,7 +184,7 @@ def __pvalue_directed(**params):
 
 """Done till here on 15/6/19"""
 
-def prune(G, field='significance', percent=None, num_remove=None):
+def prune(G, attribute_to_prune='significance', percentage_of_edges_to_remove=None, number_of_edges_to_remove=None):
     """
     Remove all but the top x percent of the edges of the graph
     with respect to an edge attribute.
@@ -195,25 +194,21 @@ def prune(G, field='significance', percent=None, num_remove=None):
     @param percent: percentage of the edges with the highest field value to retain.
     @param num_remove: number of edges to remove. Used only if C{percent} is C{None}.
     """
-    fieldh = nx.get_edge_attributes(G, field)
-    f = np.zeros(len(G.edges()))
-    i = 0
-    for e in G.edges():
-        f[i] = fieldh[e]
-        i = i + 1
+    edge_and_attribute_dict = nx.get_edge_attributes(G, attribute_to_prune)
 
-    if percent:
-        deathrow = []
-        n = len(G.edges())
-        threshold_index = n - n * percent / 100
-        threshold_value = sorted(f)[threshold_index]
+    if percentage_of_edges_to_remove:
+        edges_to_remove = []
+        number_of_edges = len(G.edges())
+        threshold_index = number_of_edges - number_of_edges * percentage_of_edges_to_remove / 100
+        threshold_value = sorted(edge_and_attribute_dict.values())[threshold_index]
 
-        for e in G.edges():
-            if fieldh[e] < threshold_value:
-                deathrow.append(e)
-        G.remove_edges_from(deathrow)
+        for edge in G.edges():
+            if edge_and_attribute_dict[edge] < threshold_value:
+                edges_to_remove.append(edge)
+        G.remove_edges_from(edges_to_remove)
 
-    elif num_remove:
-        sorted_indices = np.argsort(feildh)
-        G.remove_edges_from(sorted_indices[:num_remove])
+    elif number_of_edges_to_remove:
+        sorted_attribute_list = sorted(attribute.items(), key=lambda kv: kv[1])
+        edges_to_remove = dict(sorted_attribute_list[:number_of_edges_to_remove]).keys()
+        G.remove_edges_from(edges_to_remove)
     return G
