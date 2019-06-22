@@ -15,15 +15,14 @@ from setuptools import setup
 
 if sys.argv[-1] == 'setup.py':
     print("To install, run 'python setup.py install'")
-    print()
 
 if sys.version_info[:2] < (3, 5):
-    error = """GraphPruning2 requires Python 3.5 or later (%d.%d detected).
+    error = "GraphPruning2 requires Python 3.5 or later (%d.%d detected)."
 
 # Write the version information.
 sys.path.insert(0, 'graphpruning2')
-import release
-version = release.write_versionfile()
+#import release
+#version = release.write_versionfile()
 sys.path.pop(0)
 
 packages = ["graphpruning2"]
@@ -34,8 +33,9 @@ install_requires = ['networkx>=2.2', 'numpy>=1.16.2', 'statsmodels>=0.9.0']
 if __name__ == "__main__":
 
     setup(
-        name=release.name.lower(),
-        version=version,
+        #name=release.name.lower(),
+        name='graphpruning2',
+        version="1.0",
         author="Nikhil Kanta",
         author_email="nikhilkantz25@gmail.com",
         license="MIT",
@@ -48,5 +48,4 @@ if __name__ == "__main__":
         classifiers=[
             'License :: OSI Approved :: MIT License',
             'Programming Language :: Python :: 3.5'
-            ],
-    )
+            ] )
