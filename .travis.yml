@@ -12,8 +12,9 @@ before_install:
   - source activate testenv
 
 install:
-  - pip install -r requirements.dev.txt
-  - conda env export -n testenv > environment.yml
+  - conda install -c anaconda networkx
+  - conda install -c anaconda statsmodels
+  - conda install -c anaconda numpy
 
 script:
   - pytest
