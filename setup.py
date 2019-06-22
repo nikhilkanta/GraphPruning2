@@ -27,7 +27,7 @@ sys.path.pop(0)
 
 packages = ["graphpruning2"]
 
-install_requires = ['networkx>=2.2', 'numpy>=1.16.2', 'statsmodels>=0.9.0']
+install_requires = ['networkx>=2.2', 'numpy>=1.16.2', 'statsmodels>=0.9.0', 'scipy>=1.1.0']
 
 
 if __name__ == "__main__":
