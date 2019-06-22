@@ -12,9 +12,9 @@ before_install:
   - source activate testenv
 
 install:
-  - conda install -c anaconda networkx
-  - conda install -c anaconda statsmodels
-  - conda install -c anaconda numpy
+  - conda install -c anaconda -y networkx
+  - conda install -c anaconda -y statsmodels
+  - conda install -c anaconda -y numpy
 
 script:
   - pytest
