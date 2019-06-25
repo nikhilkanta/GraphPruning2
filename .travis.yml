@@ -5,9 +5,9 @@ python:
 
 install:
   - pip install -r requirements.dev.txt
-  
+
 script:
-  - pytest
+  - nosetests --with-coverage --cover-package app
 
 after_success:
   - coveralls
