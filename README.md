@@ -23,7 +23,7 @@
 
 <br/>
 
-Package for "pruning" weighted complex networks based on the Marginal Likelihood Filter.
+Networkx based Package for "pruning" weighted complex networks based on the Marginal Likelihood Filter.
 
 # Overview
 When dealing with weighted complex networks of dyadic relationships between nodes, we frequently encounter overly-dense "hairball" networks where the large number of edges may obfuscate the most important structures within the graph.
